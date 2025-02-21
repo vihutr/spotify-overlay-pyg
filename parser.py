@@ -10,17 +10,24 @@ class ParsedCurrentlyPlaying:
         self.update_time(data)
 
     def load(self, data):
-        self.album = ParsedAlbum(data['item']['album'])
-        self.song = ParsedSong(data['item'])
+        if data:
+            self.album = ParsedAlbum(data['item']['album'])
+            self.song = ParsedSong(data['item'])
+        else:
+            self.song = None
 
     def update_time(self, data):
         # we can assume the song is playing normally for the most part
         # we make a request to the api every x% of the song length to verify
         # use duration_ms to calculate update timing to not overuse api calls
-        self.progress_ms = data['progress_ms']
-        self.duration_ms = data['item']['duration_ms']
+        if data:
+            self.progress_ms = data['progress_ms']
+            self.duration_ms = data['item']['duration_ms']
+            self.is_playing = data['is_playing']
+        else:
+            self.progress_ms = 0
+            self.duration_ms = 1
         self.progress_percent = self.progress_ms / self.duration_ms
-        self.is_playing = data['is_playing']
         self.duration_text = SETTINGS.font.render(
             convert_ms(self.duration_ms),
             True,
@@ -30,15 +37,16 @@ class ParsedCurrentlyPlaying:
                                                SETTINGS.win_size[1] - 1)
 
     def render_text(self):
-        self.album.render_text()
-        self.song.render_text()
-        # color = '#ffffff'
-        self.progress_text = SETTINGS.font.render(
-            convert_ms(self.progress_ms),
-            True,
-            SETTINGS.time_color)
-        self.progress_text_rect = self.progress_text.get_rect()
-        self.progress_text_rect.bottomleft = (1, SETTINGS.win_size[1] - 1)
+        if self.song:
+            self.album.render_text()
+            self.song.render_text()
+            # color = '#ffffff'
+            self.progress_text = SETTINGS.font.render(
+                convert_ms(self.progress_ms),
+                True,
+                SETTINGS.time_color)
+            self.progress_text_rect = self.progress_text.get_rect()
+            self.progress_text_rect.bottomleft = (1, SETTINGS.win_size[1] - 1)
 
 
 class ParsedAlbum:

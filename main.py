@@ -88,14 +88,15 @@ while running:
             pressed = False
 
     window.fill(bg_color)
-    window.blit(current.album.pg_img, (0, 0))
-    p_bar.draw(window)
-    window.blit(current.song.name_text, (70, 3))
-    window.blit(current.album.name_text, (70, 23))
-    window.blit(current.song.artist_text, (70, 43))
-    window.blit(current.progress_text, current.progress_text_rect)
-    window.blit(current.duration_text, current.duration_text_rect)
+    if current.song:
+        window.blit(current.album.pg_img, (0, 0))
+        window.blit(current.song.name_text, (70, 3))
+        window.blit(current.album.name_text, (70, 23))
+        window.blit(current.song.artist_text, (70, 43))
+        window.blit(current.progress_text, current.progress_text_rect)
+        window.blit(current.duration_text, current.duration_text_rect)
     # window.blit(current.duration_text, (400-10, 66))
+    p_bar.draw(window)
 
     pg.display.flip()
 pg.quit()
