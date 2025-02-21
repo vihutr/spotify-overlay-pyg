@@ -27,5 +27,6 @@ class SETTINGS:
 
     # font
     font_size = 12
-    font_name = 'notosanscjksc'
-    font = pg.font.SysFont(font_name, size=font_size)
+    # font_name = 'notosanscjksc'
+    # font = pg.font.SysFont(font_name, size=font_size)
+    font = pg.font.Font('fonts/NotoSansCJK-Medium.ttc', size=font_size)
