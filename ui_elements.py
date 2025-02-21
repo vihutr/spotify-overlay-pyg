@@ -3,12 +3,7 @@ import os
 
 from config import SETTINGS
 
-
 class ProgressBar:
-    empty_color = '#4d4d4d'
-    filled_color = '#ffffff'
-    highlight_color = '#1db954'
-
     def __init__(self):
         self.percent_filled = 0
         self.highlight = False
@@ -17,12 +12,12 @@ class ProgressBar:
     
     def update(self):
         self.surface = pg.Surface((self.w, self.h))
-        pg.draw.rect(self.surface, ProgressBar.empty_color, self.empty_bar)
+        pg.draw.rect(self.surface, SETTINGS.bar_empty_color, self.empty_bar)
         if not self.highlight:
-            pg.draw.rect(self.surface, ProgressBar.filled_color,
+            pg.draw.rect(self.surface, SETTINGS.bar_filled_color,
                          self.filled_bar)
         else:
-            pg.draw.rect(self.surface, ProgressBar.highlight_color,
+            pg.draw.rect(self.surface, SETTINGS.bar_highlight_color,
                          self.filled_bar)
 
     def draw(self, surf: pg.Surface):
@@ -67,7 +62,7 @@ if __name__ == '__main__':
         timer += dt / 1000
         if seconds != int(timer):
             seconds = int(timer)
-            p_bar.fill_bar(seconds/60)
+            p_bar.fill_bar(seconds / 60)
         p_bar.update()
         for e in pg.event.get():
             if e.type == pg.QUIT:

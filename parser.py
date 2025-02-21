@@ -39,7 +39,6 @@ class ParsedCurrentlyPlaying:
         if self.song:
             self.album.render_text()
             self.song.render_text()
-            # color = '#ffffff'
             self.progress_text = SETTINGS.font.render(
                 convert_ms(self.progress_ms),
                 True,
@@ -49,8 +48,6 @@ class ParsedCurrentlyPlaying:
 
 
 class ParsedAlbum:
-    color = '#ffffff'
-
     def __init__(self, data: dict):
         self.name = data['name']
         images = data['images']
@@ -68,12 +65,9 @@ class ParsedAlbum:
     
     def render_text(self):
         self.name_text = render_cutoff_text(self.name,
-                                            ParsedAlbum.color)
+                                            SETTINGS.album_color)
 
 class ParsedSong:
-    color = '#ffffff'
-    subcolor = '#aaaaaa'
-
     def __init__(self, data: dict):
         self.name = data['name']
         self.artists = []
@@ -88,9 +82,9 @@ class ParsedSong:
 
     def render_text(self):
         self.name_text = render_cutoff_text(self.name,
-                                            ParsedSong.color)
+                                            SETTINGS.song_color)
         self.artist_text = render_cutoff_text(self.artists_string,
-                                              ParsedSong.subcolor)
+                                              SETTINGS.artists_color)
 
 def render_cutoff_text(string: str, color) -> pg.Surface:
     trim = 0

@@ -11,11 +11,24 @@ pg.font.init()
 # limit requests to make script more efficient (consider adding this as a config setting var too)
 
 class SETTINGS:
+    # pg settings
     fps = 60
     update_interval = 5
     win_size = (400, 64 + 20)
     art_size = 64
+
+    # colors
+    win_bg_color = '#000000'
     time_color = '#ffffff'
+    song_color = '#ffffff'
+    album_color = '#ffffff'
+    artists_color = '#ffffff'
+    bar_empty_color = '#4d4d4d'
+    bar_filled_color = '#ffffff'
+    bar_highlight_color = '#1db954'
+
+    # font
     font_size = 12
-    font = pg.font.SysFont('notosanscjksc', size=font_size)
+    font_name = 'notosanscjksc'
+    font = pg.font.SysFont(font_name, size=font_size)
 

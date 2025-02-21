@@ -8,7 +8,6 @@ from parser import ParsedCurrentlyPlaying
 from ui_elements import ProgressBar
 from config import SETTINGS
 
-bg_color = '#000000'
 
 load_dotenv()
 
@@ -90,7 +89,7 @@ while running:
             p_bar.update()
             current.render_text()
             current.update_time()
-    window.fill(bg_color)
+    window.fill(SETTINGS.win_bg_color)
     if current.song:
         window.blit(current.album.pg_img, (0, 0))
         window.blit(current.song.name_text, (70, 3))
