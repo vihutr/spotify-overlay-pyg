@@ -5,10 +5,8 @@ pg.font.init()
 # todo:
 # consider scrolling text for player?
 # auto resizing elements
-# consolidate more values into settings and relying on them throughout the code
-## move more colors into here
+## need to fix (or lock) vertical resizing
 # add controls?
-# limit requests to make script more efficient (consider adding this as a config setting var too)
 
 class SETTINGS:
     # pg settings
