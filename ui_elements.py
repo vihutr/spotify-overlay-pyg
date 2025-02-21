@@ -1,21 +1,18 @@
 import pygame as pg
 import os
 
+from config import SETTINGS
+
 
 class ProgressBar:
     empty_color = '#4d4d4d'
     filled_color = '#ffffff'
     highlight_color = '#1db954'
 
-    def __init__(self, surf: pg.Surface):
-        self.w, h = surf.get_size()
-        self.h = h // 25
-        self.pos = (0, 64)
+    def __init__(self):
+        self.percent_filled = 0
         self.highlight = False
-
-        self.rect = pg.Rect(self.pos, (self.w, self.h))
-        self.empty_bar = pg.Rect(0, 0, self.w, self.h)
-        self.fill_bar(0)
+        self.resize()
         self.update()
     
     def update(self):
@@ -28,11 +25,20 @@ class ProgressBar:
             pg.draw.rect(self.surface, ProgressBar.highlight_color,
                          self.filled_bar)
 
-    def fill_bar(self, percent):
-        self.filled_bar = pg.Rect(0, 0, self.w * percent, self.h)
-    
     def draw(self, surf: pg.Surface):
         surf.blit(self.surface, self.rect)
+
+    def fill_bar(self, percent):
+        self.percent_filled = percent
+        self.filled_bar = pg.Rect(0, 0, self.w * self.percent_filled, self.h)
+    
+    def resize(self):
+        self.w, h = SETTINGS.win_size
+        self.h = h // 25
+        self.pos = (0, SETTINGS.art_size)
+        self.rect = pg.Rect(self.pos, (self.w, self.h))
+        self.empty_bar = pg.Rect(0, 0, self.w, self.h)
+        self.fill_bar(self.percent_filled)
 
 if __name__ == '__main__':
     pg.init()

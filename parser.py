@@ -6,6 +6,8 @@ from config import SETTINGS
 
 class ParsedCurrentlyPlaying:
     def __init__(self, data: dict):
+        self.progress_ms = 0
+        self.duration_ms = 1
         self.load(data)
         self.update_time(data)
 
@@ -16,7 +18,7 @@ class ParsedCurrentlyPlaying:
         else:
             self.song = None
 
-    def update_time(self, data):
+    def update_time(self, data=None):
         # we can assume the song is playing normally for the most part
         # we make a request to the api every x% of the song length to verify
         # use duration_ms to calculate update timing to not overuse api calls
@@ -24,9 +26,6 @@ class ParsedCurrentlyPlaying:
             self.progress_ms = data['progress_ms']
             self.duration_ms = data['item']['duration_ms']
             self.is_playing = data['is_playing']
-        else:
-            self.progress_ms = 0
-            self.duration_ms = 1
         self.progress_percent = self.progress_ms / self.duration_ms
         self.duration_text = SETTINGS.font.render(
             convert_ms(self.duration_ms),

@@ -45,10 +45,8 @@ pressed = False
 start_mouse_pos = None
 timer = 0
 seconds = 0
-update_interval = 5
-fps = 30
 current = ParsedCurrentlyPlaying(result)
-p_bar = ProgressBar(window)
+p_bar = ProgressBar()
 p_bar.fill_bar(current.progress_percent)
 p_bar.update()
 prev_percent = current.progress_percent
@@ -56,7 +54,7 @@ prev_percent = current.progress_percent
 current.render_text()
 
 while running:
-    dt = clock.tick(30)
+    dt = clock.tick(SETTINGS.fps)
     timer += dt / 1000
     if seconds != int(timer):
         seconds = int(timer)
@@ -86,7 +84,12 @@ while running:
             start_mouse_pos = pg.mouse.get_pos()
         if e.type == pg.MOUSEBUTTONUP:
             pressed = False
-
+        if e.type == pg.VIDEORESIZE:
+            SETTINGS.win_size = window.get_size()
+            p_bar.resize()
+            p_bar.update()
+            current.render_text()
+            current.update_time()
     window.fill(bg_color)
     if current.song:
         window.blit(current.album.pg_img, (0, 0))
