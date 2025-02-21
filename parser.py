@@ -93,14 +93,17 @@ class ParsedSong:
                                               ParsedSong.subcolor)
 
 def render_cutoff_text(string: str, color) -> pg.Surface:
-    result = SETTINGS.font.render(string, True, color)
     trim = 0
-    while result.get_size()[0] + 70 > SETTINGS.win_size[0]:
+    print(trim)
+    result = SETTINGS.font.render(string, True, color)
+    # consider calculating size based on font width?
+    while result.get_size()[0] + 70 > SETTINGS.win_size[0] and trim < SETTINGS.win_size[0]:
         result = SETTINGS.font.render(
             string[0:len(string) - trim] + '...',
             True,
             color)
         trim += 1
+        print(trim)
     return result
 
 def convert_ms(ms: int) -> str:
