@@ -48,29 +48,35 @@ current = ParsedCurrentlyPlaying(result)
 p_bar = ProgressBar()
 p_bar.fill_bar(current.progress_percent)
 p_bar.update()
-prev_percent = current.progress_percent
 
 current.render_text()
+current.render_time()
 
 while running:
     dt = clock.tick(SETTINGS.fps)
     timer += dt / 1000
+    if current.is_playing:
+        current.progress_ms += dt
     if seconds != int(timer):
         seconds = int(timer)
         p_bar.fill_bar(current.progress_percent)
         p_bar.update()
-        result = sp.currently_playing()
-        if prev_percent < current.progress_percent:
-            current.update_time(result)
-            print(current.song.name,
-                  current.song.artists,
-                  current.album.name,
-                  current.album.url,
-                  current.song.url)
+        routine_call = seconds % SETTINGS.request_interval == 0
+        check_new_song = current.progress_ms > current.duration_ms
+        if check_new_song or routine_call:
+            print('api call')
+            result = sp.currently_playing()
+            if check_new_song or current.quick_compare(result):
+                print('reload assets')
+                current = ParsedCurrentlyPlaying(result)
+                current.render_text()
+            else:
+                # print('routine time sync')
+                current.update_time(result)
         else:
-            current = ParsedCurrentlyPlaying(result)
-            current.render_text()
-        prev_percent = current.progress_percent
+            print('non-api request update')
+            current.update_time()
+        current._time()
 
     for e in pg.event.get():
         if e.type == pg.QUIT:

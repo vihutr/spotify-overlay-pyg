@@ -10,12 +10,19 @@ class ParsedCurrentlyPlaying:
         self.duration_ms = 1
         self.load(data)
         self.update_time(data)
+    
+    def __str__(self):
+        return f'{self.song.name}, {self.song.artists}, {self.album.name}'
+        # return f'{self.song.name}, {self.song.artists}, {self.album.name}, {self.album.url}, {self.song.url}'
 
     def load(self, data):
+        print('loading data')
         if data:
+            print('loading album and song info')
             self.album = ParsedAlbum(data['item']['album'])
             self.song = ParsedSong(data['item'])
         else:
+            print('no data to load')
             self.song = None
 
     def update_time(self, data=None):
@@ -39,12 +46,19 @@ class ParsedCurrentlyPlaying:
         if self.song:
             self.album.render_text()
             self.song.render_text()
-            self.progress_text = SETTINGS.font.render(
-                convert_ms(self.progress_ms),
-                True,
-                SETTINGS.time_color)
-            self.progress_text_rect = self.progress_text.get_rect()
-            self.progress_text_rect.bottomleft = (1, SETTINGS.win_size[1] - 1)
+
+    def render_time(self):
+        self.progress_text = SETTINGS.font.render(
+            convert_ms(self.progress_ms),
+            True,
+            SETTINGS.time_color)
+        self.progress_text_rect = self.progress_text.get_rect()
+        self.progress_text_rect.bottomleft = (1, SETTINGS.win_size[1] - 1)
+
+    def quick_compare(self, data) -> bool:
+        if data['item']['name'] != self.song.name:
+            return True
+        return False
 
 
 class ParsedAlbum:
@@ -79,7 +93,7 @@ class ParsedSong:
             else:
                 self.artists_string += f', {a['name']}'
         self.url = data['external_urls']['spotify']
-
+    
     def render_text(self):
         self.name_text = render_cutoff_text(self.name,
                                             SETTINGS.song_color)
@@ -88,7 +102,6 @@ class ParsedSong:
 
 def render_cutoff_text(string: str, color) -> pg.Surface:
     trim = 0
-    print(trim)
     result = SETTINGS.font.render(string, True, color)
     # consider calculating size based on font width?
     while result.get_size()[0] + 70 > SETTINGS.win_size[0] and trim < SETTINGS.win_size[0]:

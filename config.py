@@ -13,7 +13,8 @@ pg.font.init()
 class SETTINGS:
     # pg settings
     fps = 60
-    update_interval = 5
+    # api call interval in seconds
+    request_interval = 5
     win_size = (400, 64 + 20)
     art_size = 64
 
