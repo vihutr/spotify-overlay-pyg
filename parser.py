@@ -8,6 +8,7 @@ class ParsedCurrentlyPlaying:
     def __init__(self, data: dict):
         self.progress_ms = 0
         self.duration_ms = 1
+        self.playing = False
         self.load(data)
         self.update_time(data)
     
