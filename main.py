@@ -95,6 +95,7 @@ while running:
             p_bar.update()
             current.render_text()
             current.update_time()
+            current.render_time()
     window.fill(SETTINGS.win_bg_color)
     if current.song:
         window.blit(current.album.pg_img, (0, 0))

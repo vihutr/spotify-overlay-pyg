@@ -4,8 +4,7 @@ pg.font.init()
 
 # todo:
 # consider scrolling text for player?
-# auto resizing elements
-## need to fix (or lock) vertical resizing
+# auto resizing elements (vertical)
 # add controls?
 
 class SETTINGS:
@@ -30,4 +29,3 @@ class SETTINGS:
     font_size = 12
     font_name = 'notosanscjksc'
     font = pg.font.SysFont(font_name, size=font_size)
-

@@ -29,7 +29,7 @@ class ProgressBar:
     
     def resize(self):
         self.w, h = SETTINGS.win_size
-        self.h = h // 25
+        self.h = 4
         self.pos = (0, SETTINGS.art_size)
         self.rect = pg.Rect(self.pos, (self.w, self.h))
         self.empty_bar = pg.Rect(0, 0, self.w, self.h)
