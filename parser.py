@@ -16,13 +16,13 @@ class ParsedCurrentlyPlaying:
         # return f'{self.song.name}, {self.song.artists}, {self.album.name}, {self.album.url}, {self.song.url}'
 
     def load(self, data):
-        print('loading data')
+        # print('loading data')
         if data:
-            print('loading album and song info')
+            # print('loading album and song info')
             self.album = ParsedAlbum(data['item']['album'])
             self.song = ParsedSong(data['item'])
         else:
-            print('no data to load')
+            # print('no data to load')
             self.song = None
 
     def update_time(self, data=None):
@@ -110,7 +110,7 @@ def render_cutoff_text(string: str, color) -> pg.Surface:
             True,
             color)
         trim += 1
-        print(trim)
+        # print(trim)
     return result
 
 def convert_ms(ms: int) -> str:

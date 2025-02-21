@@ -64,19 +64,19 @@ while running:
         routine_call = seconds % SETTINGS.request_interval == 0
         check_new_song = current.progress_ms > current.duration_ms
         if check_new_song or routine_call:
-            print('api call')
+            # print('api call')
             result = sp.currently_playing()
             if check_new_song or current.quick_compare(result):
-                print('reload assets')
+                # print('reload assets')
                 current = ParsedCurrentlyPlaying(result)
                 current.render_text()
             else:
                 # print('routine time sync')
                 current.update_time(result)
         else:
-            print('non-api request update')
+            # print('non-api request update')
             current.update_time()
-        current._time()
+        current.render_time()
 
     for e in pg.event.get():
         if e.type == pg.QUIT:

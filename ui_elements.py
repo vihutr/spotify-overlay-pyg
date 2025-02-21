@@ -48,7 +48,7 @@ if __name__ == '__main__':
     clock = pg.time.Clock()
 
     p_bar = ProgressBar(window)
-    print(p_bar.w, p_bar.h)
+    # print(p_bar.w, p_bar.h)
 
     running = True
     pressed = False
