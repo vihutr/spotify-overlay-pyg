@@ -27,9 +27,6 @@ class ParsedCurrentlyPlaying:
             self.song = None
 
     def update_time(self, data=None):
-        # we can assume the song is playing normally for the most part
-        # we make a request to the api every x% of the song length to verify
-        # use duration_ms to calculate update timing to not overuse api calls
         if data:
             self.progress_ms = data['progress_ms']
             self.duration_ms = data['item']['duration_ms']
