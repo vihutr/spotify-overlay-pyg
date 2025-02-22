@@ -31,8 +31,9 @@ win_flags = pg.RESIZABLE
 info = pg.display.Info()
 screen_w = info.current_w
 screen_h = info.current_h
-win_x = 10
-win_y = screen_h - 40
+win_x = screen_w - SETTINGS.win_size[0]
+# 70 = account for potential taskbar + the extra window frame size
+win_y = screen_h - 70 - SETTINGS.win_size[1]
 os.environ['SDL_VIDEO_WINDOW_POS'] = f'{win_x}, {win_y}'
 
 window = pg.display.set_mode(SETTINGS.win_size, flags=win_flags)
