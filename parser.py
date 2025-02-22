@@ -37,8 +37,8 @@ class ParsedCurrentlyPlaying:
             True,
             SETTINGS.time_color)
         self.duration_text_rect = self.duration_text.get_rect()
-        self.duration_text_rect.bottomright = (SETTINGS.win_size[0] - 1,
-                                               SETTINGS.win_size[1] - 1)
+        self.duration_text_rect.bottomright = (SETTINGS.win_size[0] - SETTINGS.time_offset_x,
+                                               SETTINGS.win_size[1] - SETTINGS.time_offset_y)
 
     def render_text(self):
         if self.song:
@@ -51,7 +51,8 @@ class ParsedCurrentlyPlaying:
             True,
             SETTINGS.time_color)
         self.progress_text_rect = self.progress_text.get_rect()
-        self.progress_text_rect.bottomleft = (1, SETTINGS.win_size[1] - 1)
+        self.progress_text_rect.bottomleft = (SETTINGS.time_offset_x,
+                                              SETTINGS.win_size[1] - SETTINGS.time_offset_y)
 
     def quick_compare(self, data) -> bool:
         if data['item']['name'] != self.song.name:

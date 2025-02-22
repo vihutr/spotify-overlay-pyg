@@ -35,6 +35,12 @@ class ProgressBar:
         self.empty_bar = pg.Rect(0, 0, self.w, self.h)
         self.fill_bar(self.percent_filled)
 
+def render_info(surf: pg.Surface, strings: list):
+    for i, s in enumerate(strings):
+        calc_x = SETTINGS.art_size + SETTINGS.text_offset_x
+        calc_y = (SETTINGS.text_margin_y * (i + 1)) + (SETTINGS.font_size + SETTINGS.text_padding_y * 2) * i
+        surf.blit(s, (calc_x, calc_y))
+
 if __name__ == '__main__':
     pg.init()
     window_flags = pg.RESIZABLE

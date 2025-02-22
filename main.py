@@ -5,7 +5,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 from parser import ParsedCurrentlyPlaying
-from ui_elements import ProgressBar
+from ui_elements import ProgressBar, render_info
 from config import SETTINGS
 
 
@@ -46,6 +46,7 @@ timer = 0
 seconds = 0
 current = ParsedCurrentlyPlaying(result)
 p_bar = ProgressBar()
+p_bar.highlight = True
 p_bar.fill_bar(current.progress_percent)
 p_bar.update()
 
@@ -96,16 +97,14 @@ while running:
             current.render_text()
             current.update_time()
             current.render_time()
+
     window.fill(SETTINGS.win_bg_color)
+    p_bar.draw(window)
     if current.song:
         window.blit(current.album.pg_img, (0, 0))
-        window.blit(current.song.name_text, (70, 3))
-        window.blit(current.album.name_text, (70, 23))
-        window.blit(current.song.artist_text, (70, 43))
+        render_info(window, (current.song.name_text, current.album.name_text, current.song.artist_text))
         window.blit(current.progress_text, current.progress_text_rect)
         window.blit(current.duration_text, current.duration_text_rect)
-    # window.blit(current.duration_text, (400-10, 66))
-    p_bar.draw(window)
 
     pg.display.flip()
 pg.quit()
