@@ -85,8 +85,8 @@ in vec2 uvs;
 out vec4 f_color;
 
 void main() {
-    vec2 sample_pos = vec2(uvs.x + sin(uvs.y * 10 + time) * 0.01, uvs.y);
-    f_color = vec4(texture(tex, sample_pos).rgb, 1.0);
+    // vec2 sample_pos = vec2(uvs.x + sin(uvs.y * 10 + time) * 0.01, uvs.y);
+    f_color = vec4(texture(tex, uvs).rgb, 1.0);
 }
 '''
 
@@ -113,6 +113,7 @@ current.render_time()
 while running:
     dt = clock.tick(SETTINGS.fps)
     timer += dt / 1000
+    print(timer)
     if current.is_playing:
         current.progress_ms += dt
     if seconds != int(timer):
@@ -166,7 +167,7 @@ while running:
     window_tex.write(window.get_view('1'))
     window_tex.use(0)
     program['tex'] = 0
-    program['time'] = timer
+    # program['time'] = timer
     render_obj.render(mode=mgl.TRIANGLE_STRIP)
 
     pg.display.flip()
