@@ -113,7 +113,6 @@ current.render_time()
 while running:
     dt = clock.tick(SETTINGS.fps)
     timer += dt / 1000
-    print(timer)
     if current.is_playing:
         current.progress_ms += dt
     if seconds != int(timer):
