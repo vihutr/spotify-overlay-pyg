@@ -12,12 +12,12 @@ from ui_elements import ProgressBar, render_info
 from config import SETTINGS
 
 
-def surf_to_texture(surf: pg.Surface):
-    tex = ctx.texture(surf.get_size(), 4)
-    tex.filter = (mgl.NEAREST, mgl.NEAREST)
-    tex.swizzle = 'BGRA'
-    tex.write(surf.get_view('1'))
-    return tex
+# def surf_to_texture(surf: pg.Surface) -> mgl.Texture:
+#     tex = ctx.texture(surf.get_size(), 4)
+#     tex.filter = (mgl.NEAREST, mgl.NEAREST)
+#     tex.swizzle = 'BGRA'
+#     tex.write(surf.get_view('1'))
+#     return tex
 
 load_dotenv()
 
@@ -79,22 +79,23 @@ frag_shader = '''
 #version 330 core
 
 uniform sampler2D tex;
+uniform float time;
 
 in vec2 uvs;
 out vec4 f_color;
 
 void main() {
-    f_color = vec4(texture(tex, uvs).rgb, 1.0);
+    vec2 sample_pos = vec2(uvs.x + sin(uvs.y * 10 + time) * 0.01, uvs.y);
+    f_color = vec4(texture(tex, sample_pos).rgb, 1.0);
 }
 '''
-
 
 program = ctx.program(vertex_shader=vert_shader, fragment_shader=frag_shader)
 render_obj = ctx.vertex_array(program, [(quad_buffer, '2f 2f', 'vert', 'texcoord')])
 
-
-
-
+window_tex = ctx.texture(window.get_size(), 4)
+window_tex.filter = (mgl.NEAREST, mgl.NEAREST)
+window_tex.swizzle = 'BGRA'
 
 running = True
 pressed = False
@@ -162,12 +163,13 @@ while running:
         window.blit(current.progress_text, current.progress_text_rect)
         window.blit(current.duration_text, current.duration_text_rect)
     
-    frame_tex = surf_to_texture(window)
-    frame_tex.use(0)
+    window_tex.write(window.get_view('1'))
+    window_tex.use(0)
     program['tex'] = 0
+    program['time'] = timer
     render_obj.render(mode=mgl.TRIANGLE_STRIP)
 
     pg.display.flip()
 
-    frame_tex.release()
+window_tex.release()
 pg.quit()
