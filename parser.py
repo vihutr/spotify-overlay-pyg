@@ -90,7 +90,7 @@ class ParsedSong:
             if self.artists_string == '':
                 self.artists_string = a['name']
             else:
-                self.artists_string += f', {a['name']}'
+                self.artists_string += f", {a['name']}"
         self.url = data['external_urls']['spotify']
     
     def render_text(self):
