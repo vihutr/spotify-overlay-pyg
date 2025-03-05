@@ -57,4 +57,4 @@ class ModernGLHandler:
         self.render_obj.render(mode=mgl.TRIANGLE_STRIP)
 
     def release(self):
-        self.window_text.release()
+        self.window_tex.release()
