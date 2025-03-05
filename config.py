@@ -8,6 +8,10 @@ pg.font.init()
 # add controls?
 
 class SETTINGS:
+    # uses opengl which currently only makes it so that resizing the window
+    # makes the player match the size of the window
+    moderngl = False
+
     # colors
     win_bg_color = '#000000'
     time_color = '#ffffff'

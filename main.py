@@ -1,12 +1,11 @@
 import os
-from array import array
 
 from dotenv import load_dotenv
-import moderngl as mgl
 import pygame as pg
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
+from mgl_context import ModernGLHandler
 from parser import ParsedCurrentlyPlaying
 from ui_elements import ProgressBar, render_info
 from config import SETTINGS
@@ -36,7 +35,10 @@ sp = spotipy.Spotify(auth_manager=auth_manager)
 result = sp.currently_playing()
 # current_playlist = url['external_urls']['spotify']
 
-win_flags = pg.RESIZABLE | pg.OPENGL | pg.DOUBLEBUF
+win_flags = pg.RESIZABLE
+if SETTINGS.moderngl:
+    win_flags = win_flags | pg.OPENGL | pg.DOUBLEBUF
+print(win_flags)
 
 pg.init()
 pg.font.init()
@@ -53,49 +55,8 @@ window = pg.Surface(screen.get_size())
 pg.display.set_caption('pyg-spotify')
 clock = pg.time.Clock()
 
-ctx = mgl.create_context()
-quad_buffer = ctx.buffer(data=array('f', [
-    # position (x, y), uv coords (x, y)
-    -1.0, 1.0, 0.0, 0.0,    # topleft
-    1.0, 1.0, 1.0, 0.0,     # topright
-    -1.0, -1.0, 0.0, 1.0,   # bottomleft
-    1.0, -1.0, 1.0, 1.0,    # bottomright
-]))
-
-vert_shader = '''
-#version 330 core
-
-in vec2 vert;
-in vec2 texcoord;
-out vec2 uvs;
-
-void main() {
-    uvs = texcoord;
-    gl_Position = vec4(vert, 0.0, 1.0);
-}
-'''
-
-frag_shader = '''
-#version 330 core
-
-uniform sampler2D tex;
-uniform float time;
-
-in vec2 uvs;
-out vec4 f_color;
-
-void main() {
-    // vec2 sample_pos = vec2(uvs.x + sin(uvs.y * 10 + time) * 0.01, uvs.y);
-    f_color = vec4(texture(tex, uvs).rgb, 1.0);
-}
-'''
-
-program = ctx.program(vertex_shader=vert_shader, fragment_shader=frag_shader)
-render_obj = ctx.vertex_array(program, [(quad_buffer, '2f 2f', 'vert', 'texcoord')])
-
-window_tex = ctx.texture(window.get_size(), 4)
-window_tex.filter = (mgl.NEAREST, mgl.NEAREST)
-window_tex.swizzle = 'BGRA'
+if SETTINGS.moderngl:
+    mglh = ModernGLHandler()
 
 running = True
 pressed = False
@@ -148,28 +109,36 @@ while running:
         if e.type == pg.MOUSEBUTTONUP:
             pressed = False
         if e.type == pg.VIDEORESIZE:
-            SETTINGS.win_size = window.get_size()
+            SETTINGS.win_size = screen.get_size()
             p_bar.resize()
             p_bar.update()
             current.render_text()
             current.update_time()
             current.render_time()
 
-    window.fill(SETTINGS.win_bg_color)
-    p_bar.draw(window)
-    if current.song:
-        window.blit(current.album.pg_img, (0, 0))
-        render_info(window, (current.song.name_text, current.album.name_text, current.song.artist_text))
-        window.blit(current.progress_text, current.progress_text_rect)
-        window.blit(current.duration_text, current.duration_text_rect)
-    
-    window_tex.write(window.get_view('1'))
-    window_tex.use(0)
-    program['tex'] = 0
-    # program['time'] = timer
-    render_obj.render(mode=mgl.TRIANGLE_STRIP)
+    if SETTINGS.moderngl:
+        window.fill(SETTINGS.win_bg_color)
+        p_bar.draw(window)
+        if current.song:
+            window.blit(current.album.pg_img, (0, 0))
+            render_info(window, (current.song.name_text, current.album.name_text, current.song.artist_text))
+            window.blit(current.progress_text, current.progress_text_rect)
+            window.blit(current.duration_text, current.duration_text_rect)
+    else:
+        screen.fill(SETTINGS.win_bg_color)
+        p_bar.draw(screen)
+        if current.song:
+            screen.blit(current.album.pg_img, (0, 0))
+            render_info(screen, (current.song.name_text, current.album.name_text, current.song.artist_text))
+            screen.blit(current.progress_text, current.progress_text_rect)
+            screen.blit(current.duration_text, current.duration_text_rect)
+        
+        
+    if SETTINGS.moderngl:
+        mglh.render(window)
 
     pg.display.flip()
 
-window_tex.release()
+if SETTINGS.moderngl:
+    mglh.release()
 pg.quit()
