@@ -42,21 +42,23 @@ print(win_flags)
 
 pg.init()
 pg.font.init()
+
 info = pg.display.Info()
-screen_w = info.current_w
-screen_h = info.current_h
-win_x = screen_w - SETTINGS.win_size[0]
+win_x = info.current_w - SETTINGS.win_size[0]
 # 70 = account for potential taskbar + the extra window frame size
-win_y = screen_h - 70 - SETTINGS.win_size[1]
+win_y = info.current_h - 70 - SETTINGS.win_size[1]
 os.environ['SDL_VIDEO_WINDOW_POS'] = f'{win_x}, {win_y}'
 
-screen = pg.display.set_mode(SETTINGS.win_size, flags=win_flags)
-window = pg.Surface(screen.get_size())
+window = pg.display.set_mode(SETTINGS.win_size, flags=win_flags)
 pg.display.set_caption('pyg-spotify')
 clock = pg.time.Clock()
 
+main_surf = window
 if SETTINGS.moderngl:
+    gl_screen = pg.Surface(SETTINGS.win_size)
     mglh = ModernGLHandler()
+    main_surf = gl_screen
+    
 
 running = True
 pressed = False
@@ -109,34 +111,23 @@ while running:
         if e.type == pg.MOUSEBUTTONUP:
             pressed = False
         if e.type == pg.VIDEORESIZE:
-            SETTINGS.win_size = screen.get_size()
+            SETTINGS.win_size = main_surf.get_size()
             p_bar.resize()
             p_bar.update()
             current.render_text()
             current.update_time()
             current.render_time()
 
+    main_surf.fill(SETTINGS.win_bg_color)
+    p_bar.draw(main_surf)
+    if current.song:
+        main_surf.blit(current.album.pg_img, (0, 0))
+        render_info(main_surf, (current.song.name_text, current.album.name_text, current.song.artist_text))
+        main_surf.blit(current.progress_text, current.progress_text_rect)
+        main_surf.blit(current.duration_text, current.duration_text_rect)
     if SETTINGS.moderngl:
-        window.fill(SETTINGS.win_bg_color)
-        p_bar.draw(window)
-        if current.song:
-            window.blit(current.album.pg_img, (0, 0))
-            render_info(window, (current.song.name_text, current.album.name_text, current.song.artist_text))
-            window.blit(current.progress_text, current.progress_text_rect)
-            window.blit(current.duration_text, current.duration_text_rect)
-    else:
-        screen.fill(SETTINGS.win_bg_color)
-        p_bar.draw(screen)
-        if current.song:
-            screen.blit(current.album.pg_img, (0, 0))
-            render_info(screen, (current.song.name_text, current.album.name_text, current.song.artist_text))
-            screen.blit(current.progress_text, current.progress_text_rect)
-            screen.blit(current.duration_text, current.duration_text_rect)
+        mglh.render(main_surf)
         
-        
-    if SETTINGS.moderngl:
-        mglh.render(window)
-
     pg.display.flip()
 
 if SETTINGS.moderngl:
