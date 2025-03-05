@@ -1,13 +1,9 @@
 import os
 
-from dotenv import load_dotenv
 import pygame as pg
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
 
 from mgl_context import ModernGLHandler
-from parser import ParsedCurrentlyPlaying
-from ui_elements import ProgressBar, render_info
+from visuals import RendererObject
 from config import SETTINGS
 
 
@@ -18,27 +14,11 @@ from config import SETTINGS
 #     tex.write(surf.get_view('1'))
 #     return tex
 
-load_dotenv()
-
-s_id = os.environ['s_id']
-s_secret = os.environ['s_secret']
-redirect_uri = "http://localhost"
-scope = "user-read-currently-playing"
-
-auth_manager = SpotifyOAuth(client_id=s_id,
-                            client_secret=s_secret,
-                            redirect_uri=redirect_uri,
-                            scope=scope)
-
-sp = spotipy.Spotify(auth_manager=auth_manager)
-
-result = sp.currently_playing()
 # current_playlist = url['external_urls']['spotify']
 
 win_flags = pg.RESIZABLE
 if SETTINGS.moderngl:
     win_flags = win_flags | pg.OPENGL | pg.DOUBLEBUF
-print(win_flags)
 
 pg.init()
 pg.font.init()
@@ -65,40 +45,13 @@ pressed = False
 start_mouse_pos = None
 timer = 0
 seconds = 0
-current = ParsedCurrentlyPlaying(result)
-p_bar = ProgressBar()
-p_bar.fill_bar(current.progress_percent)
-p_bar.update()
 
-current.render_text()
-current.render_time()
+robj = RendererObject()
 
 while running:
     dt = clock.tick(SETTINGS.fps)
     timer += dt / 1000
-    if current.is_playing:
-        current.progress_ms += dt
-    if seconds != int(timer):
-        seconds = int(timer)
-        p_bar.fill_bar(current.progress_percent)
-        p_bar.update()
-        routine_call = seconds % SETTINGS.request_interval == 0
-        check_new_song = current.progress_ms > current.duration_ms
-        if check_new_song or routine_call:
-            # print('api call')
-            result = sp.currently_playing()
-            if check_new_song or current.quick_compare(result):
-                # print('reload assets')
-                current = ParsedCurrentlyPlaying(result)
-                current.render_text()
-            else:
-                # print('routine time sync')
-                current.update_time(result)
-        else:
-            # print('non-api request update')
-            current.update_time()
-        current.render_time()
-
+    robj.update(dt, timer, seconds)
     for e in pg.event.get():
         if e.type == pg.QUIT:
             running = False
@@ -112,19 +65,12 @@ while running:
             pressed = False
         if e.type == pg.VIDEORESIZE:
             SETTINGS.win_size = main_surf.get_size()
-            p_bar.resize()
-            p_bar.update()
-            current.render_text()
-            current.update_time()
-            current.render_time()
+            robj.resize_update()
 
     main_surf.fill(SETTINGS.win_bg_color)
-    p_bar.draw(main_surf)
-    if current.song:
-        main_surf.blit(current.album.pg_img, (0, 0))
-        render_info(main_surf, (current.song.name_text, current.album.name_text, current.song.artist_text))
-        main_surf.blit(current.progress_text, current.progress_text_rect)
-        main_surf.blit(current.duration_text, current.duration_text_rect)
+    robj.bar.draw(main_surf)
+    if robj.current.song:
+        robj.draw(main_surf)
     if SETTINGS.moderngl:
         mglh.render(main_surf)
         

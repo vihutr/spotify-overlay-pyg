@@ -1,64 +1,72 @@
+from dotenv import load_dotenv
 from io import BytesIO
+import os
+
 import pygame as pg
 import requests
 
 from config import SETTINGS
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 
-class ParsedCurrentlyPlaying:
-    def __init__(self, data: dict):
+
+
+# rename and consider distinguishing/combining with ui_elements
+class CurrentlyPlayingParser:
+    def __init__(self):
+        load_dotenv()
+
+        s_id = os.environ['s_id']
+        s_secret = os.environ['s_secret']
+        redirect_uri = "http://localhost"
+        scope = "user-read-currently-playing"
+
+        auth_manager = SpotifyOAuth(client_id=s_id,
+                                    client_secret=s_secret,
+                                    redirect_uri=redirect_uri,
+                                    scope=scope)
+        self.sp = spotipy.Spotify(auth_manager=auth_manager)
+        self.song = None
+        self.album = None
         self.progress_ms = 0
         self.duration_ms = 1
         self.playing = False
-        self.load(data)
-        self.update_time(data)
+        self.data = None
+        self.load()
+        self.parse()
+        self.calculate_percent()
     
     def __str__(self):
         return f'{self.song.name}, {self.song.artists}, {self.album.name}'
         # return f'{self.song.name}, {self.song.artists}, {self.album.name}, {self.album.url}, {self.song.url}'
 
-    def load(self, data):
+    def load(self):
+        self.data = self.sp.currently_playing()
+
+    def parse(self):
         # print('loading data')
-        if data:
+        if self.data:
             # print('loading album and song info')
-            self.album = ParsedAlbum(data['item']['album'])
-            self.song = ParsedSong(data['item'])
-        else:
-            # print('no data to load')
-            self.song = None
+            self.song = ParsedSong(self.data['item'])
+            self.album = ParsedAlbum(self.data['item']['album'])
+            self.progress_ms = self.data['progress_ms']
+            self.duration_ms = self.data['item']['duration_ms']
+            self.playing = self.data['is_playing']
 
-    def update_time(self, data=None):
-        if data:
-            self.progress_ms = data['progress_ms']
-            self.duration_ms = data['item']['duration_ms']
-            self.is_playing = data['is_playing']
+    def sync_time(self):
+        if self.data:
+            self.progress_ms = self.data['progress_ms']
+            self.duration_ms = self.data['item']['duration_ms']
+            self.playing = self.data['is_playing']
+        self.calculate_percent()
+
+    def calculate_percent(self):
         self.progress_percent = self.progress_ms / self.duration_ms
-        self.duration_text = SETTINGS.font.render(
-            convert_ms(self.duration_ms),
-            True,
-            SETTINGS.time_color)
-        self.duration_text_rect = self.duration_text.get_rect()
-        self.duration_text_rect.bottomright = (SETTINGS.win_size[0] - SETTINGS.time_offset_x,
-                                               SETTINGS.win_size[1] - SETTINGS.time_offset_y)
 
-    def render_text(self):
-        if self.song:
-            self.album.render_text()
-            self.song.render_text()
-
-    def render_time(self):
-        self.progress_text = SETTINGS.font.render(
-            convert_ms(self.progress_ms),
-            True,
-            SETTINGS.time_color)
-        self.progress_text_rect = self.progress_text.get_rect()
-        self.progress_text_rect.bottomleft = (SETTINGS.time_offset_x,
-                                              SETTINGS.win_size[1] - SETTINGS.time_offset_y)
-
-    def quick_compare(self, data) -> bool:
-        if data['item']['name'] != self.song.name:
+    def quick_name_compare(self) -> bool:
+        if self.data['item']['name'] != self.song.name:
             return True
         return False
-
 
 class ParsedAlbum:
     def __init__(self, data: dict):
@@ -75,10 +83,6 @@ class ParsedAlbum:
                     self.pg_img, (SETTINGS.art_size, SETTINGS.art_size))
         # not displayed
         self.url = data['external_urls']['spotify']
-    
-    def render_text(self):
-        self.name_text = render_cutoff_text(self.name,
-                                            SETTINGS.album_color)
 
 class ParsedSong:
     def __init__(self, data: dict):
@@ -92,31 +96,3 @@ class ParsedSong:
             else:
                 self.artists_string += f", {a['name']}"
         self.url = data['external_urls']['spotify']
-    
-    def render_text(self):
-        self.name_text = render_cutoff_text(self.name,
-                                            SETTINGS.song_color)
-        self.artist_text = render_cutoff_text(self.artists_string,
-                                              SETTINGS.artists_color)
-
-def render_cutoff_text(string: str, color) -> pg.Surface:
-    trim = 0
-    result = SETTINGS.font.render(string, True, color)
-    # consider calculating size based on font width?
-    while result.get_size()[0] + 70 > SETTINGS.win_size[0] and trim < SETTINGS.win_size[0]:
-        result = SETTINGS.font.render(
-            string[0:len(string) - trim] + '...',
-            True,
-            color)
-        trim += 1
-        # print(trim)
-    return result
-
-def convert_ms(ms: int) -> str:
-    ms = int(ms)
-    secs = int((ms / 1000) % 60)
-    mins = int((ms / (1000 * 60)) % 60)
-    hrs = int((ms / (1000 * 60 * 60)) % 24)
-    if hrs > 0:
-        return f'{hrs}:{mins}:{str(secs).zfill(2)}'
-    return f'{mins}:{str(secs).zfill(2)}'
