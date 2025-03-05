@@ -1,5 +1,4 @@
 import pygame as pg
-import os
 
 from config import SETTINGS
 from parser import CurrentlyPlayingParser
@@ -44,7 +43,6 @@ class RendererObject:
         self.render_info(surf)
         surf.blit(self.progress_text, self.progress_text_rect)
         surf.blit(self.duration_text, self.duration_text_rect)
-
 
     def resize_update(self):
         self.bar.resize()

@@ -3,6 +3,13 @@ from array import array
 import moderngl as mgl
 from config import SETTINGS
 
+# def surf_to_texture(surf: pg.Surface) -> mgl.Texture:
+#     tex = ctx.texture(surf.get_size(), 4)
+#     tex.filter = (mgl.NEAREST, mgl.NEAREST)
+#     tex.swizzle = 'BGRA'
+#     tex.write(surf.get_view('1'))
+#     return tex
+
 vert_shader = '''
 #version 330 core
 

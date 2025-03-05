@@ -7,15 +7,6 @@ from visuals import RendererObject
 from config import SETTINGS
 
 
-# def surf_to_texture(surf: pg.Surface) -> mgl.Texture:
-#     tex = ctx.texture(surf.get_size(), 4)
-#     tex.filter = (mgl.NEAREST, mgl.NEAREST)
-#     tex.swizzle = 'BGRA'
-#     tex.write(surf.get_view('1'))
-#     return tex
-
-# current_playlist = url['external_urls']['spotify']
-
 win_flags = pg.RESIZABLE
 if SETTINGS.moderngl:
     win_flags = win_flags | pg.OPENGL | pg.DOUBLEBUF
@@ -38,7 +29,6 @@ if SETTINGS.moderngl:
     gl_screen = pg.Surface(SETTINGS.win_size)
     mglh = ModernGLHandler()
     main_surf = gl_screen
-    
 
 running = True
 pressed = False

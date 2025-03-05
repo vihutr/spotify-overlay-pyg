@@ -9,9 +9,6 @@ from config import SETTINGS
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-
-
-# rename and consider distinguishing/combining with ui_elements
 class CurrentlyPlayingParser:
     def __init__(self):
         load_dotenv()
